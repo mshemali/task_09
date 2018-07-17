@@ -1,18 +1,76 @@
 from django.shortcuts import render, redirect
 from .models import Restaurant
-from .forms import RestaurantForm
+from .forms import RestaurantForm, SignupForm, SigninForm
+
+from django.contrib.auth import login, authenticate,logout
+
+
+
+
+
+# def signup(request):
+#     form = SignupForm()
+#     if request.method == 'POST':
+#         form = SignupForm(request.POST)
+#         if form.is_valid():
+#             user = form.save(commit=False)
+#             user.set_password(user.password)
+#             user.save()
+#             login(request, user)
+#             # Where you want to go after a successful signup
+#                 return redirect("signup.html")
+#     context = {
+#         "form":form,
+#     }
+#     return render(request, 'signup.html', context)
 
 def signup(request):
-    
+    form = SignupForm()
+    if request.method == 'POST':
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+
+            user.set_password(user.password)
+            user.save()
+
+            login(request, user)
+            # Where you want to go after a successful signup
+            return redirect("restaurant-list")
+    context = {
+        "form":form,
+    }
     return render(request, 'signup.html', context)
 
+
 def signin(request):
-    
-    return 
+    form = SigninForm()
+    if request.method == 'POST':
+        form = SigninForm(request.POST)
+        if form.is_valid():
+
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+
+            auth_user = authenticate(username=username, password=password)
+            if auth_user is not None:
+                login(request, auth_user)
+                # Where you want to go after a successful login
+                return redirect("restaurant-list")
+
+    context = {
+        "form":form
+    }
+    return render(request, 'signin.html', context)
+
+
+
 
 def signout(request):
-    
-    return 
+    logout(request)
+    # Where you would like to redirect the user after successfully logging out
+    return redirect("restaurant-list")
+    # return render(request, 'successful-logout.html')
 
 def restaurant_list(request):
     context = {
